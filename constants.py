@@ -1,3 +1,7 @@
 DATA_DIR = "data"
 OUTPUT_DIR = "temp"
 STAGING_DIR = "temp/staging"
+AMPLITUDE_THRESHOLD = 50
+
+INPUTS = 10
+OUTPUTS = 68
