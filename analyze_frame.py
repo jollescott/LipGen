@@ -12,7 +12,7 @@ detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("models/shape_predictor_68_face_landmarks.dat")
 
 
-def process_frame(path, preview=False):
+def process_frame(path):
     image = cv2.imread(path)
     grayscale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
@@ -25,31 +25,18 @@ def process_frame(path, preview=False):
     rect = rects[0]
 
     shape = predictor(grayscale, rect)
-    shape = face_utils.shape_to_np(shape)
+    values = []
 
-    if preview:
-        (x, y, b, h) = face_utils.rect_to_bb(rect)
+    for i in range(0, shape.num_parts):
+        values.append(shape.part(i).x)
+        values.append(shape.part(i).y)
 
-        for (x, y) in shape:
-            cv2.circle(image, (x, y), 1, (0, 0, 255), -1)
-
-        cv2.imshow("Preview", image)
-        cv2.waitKey()
-    else:
-        with open(
-            join(
-                OUTPUT_DIR,
-                "output",
-                Path(path).stem + ".json",
-            ),
-            "w",
-        ) as f:
-            json.dump(shape.tolist(), f)
-
-
-if __name__ == "__main__":
-    ap = argparse.ArgumentParser()
-    ap.add_argument("image")
-    args = ap.parse_args()
-
-    process_frame(join(STAGING_DIR, args.image))
+    with open(
+        join(
+            OUTPUT_DIR,
+            "output",
+            Path(path).stem + ".json",
+        ),
+        "w",
+    ) as f:
+        json.dump(values, f)
