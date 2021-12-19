@@ -6,7 +6,7 @@ import json
 from os.path import join
 import numpy as np
 
-from constants import OUTPUT_DIR
+from constants import INPUTS, OUTPUT_DIR, OUTPUTS, EPOCHS
 
 
 def normalize_data(data):
@@ -31,26 +31,32 @@ def import_data(type):
 
 
 def build_model():
-    inputs = keras.Input(shape=(10))
-    x = layers.Flatten()
+    inputs = keras.Input(shape=(INPUTS))
+    x = layers.Flatten()(inputs)
     x = layers.Dense(128, activation="relu")(x)
     x = layers.Dense(128, activation="relu")(x)
-    outputs = layers.Dense(10, activation="softmax")(x)
+    outputs = layers.Dense(OUTPUTS, activation="softmax")(x)
     model = keras.Model(inputs, outputs)
     return model
 
 
 def train_model(model, input, output):
-    model.compile(optimizer="adam", loss="sparse_categorical_crossentropy")
-    model.fit(input, output, batch_size=64, epochs=1)
+    model.compile(optimizer="adam", loss="categorical_crossentropy")
+    model.fit(input, output, batch_size=64, epochs=EPOCHS)
 
 
 if __name__ == "__main__":
-    input = import_data("input")
-    output = import_data("output")
+    train_input = import_data("input/train")
+    train_output = import_data("output/train")
 
-    input = normalize_data(input)
-    output = normalize_data(output)
+    train_input = normalize_data(train_input)
+    train_output = normalize_data(train_output)
+
+    validate_input = import_data("input/validate")
+    validate_output = import_data("output/validate")
+
+    validate_input = normalize_data(validate_input)
+    validate_output = normalize_data(validate_output)
 
     model = build_model()
-    train_model(model, input, output)
+    train_model(model, train_input, train_output)
