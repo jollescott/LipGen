@@ -20,7 +20,7 @@ def process_frame(path):
 
     if len(rects) == 0:
         print('"{}" Failed to recognize any faces, skipping...'.format(path))
-        return
+        return False
 
     rect = rects[0]
 
@@ -40,3 +40,5 @@ def process_frame(path):
         "w",
     ) as f:
         json.dump(values, f)
+
+    return True

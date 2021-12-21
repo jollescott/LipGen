@@ -7,7 +7,7 @@ from pathlib import Path
 
 from analyze_audio import process_audio
 from analyze_frame import process_frame
-from constants import DATA_DIR, OUTPUT_DIR, STAGING_DIR
+from constants import DATA_DIR, STAGING_DIR
 
 SPLIT_DELTA = 0.25
 
@@ -65,25 +65,19 @@ def process_data():
         if isfile(join(STAGING_DIR, f))
     ]
 
-    for a in [f for f in items if "wav" in f.split(".")]:
-        process_audio(a)
+    failed = []
 
     for p in [f for f in items if "png" in f.split(".")]:
-        process_frame(p)
+        if process_frame(p) is False:
+            failed.append(Path(p).stem)
+
+    for a in [f for f in items if "wav" in f.split(".")]:
+        if Path(a).stem not in failed:
+            process_audio(a)
+        else:
+            print("Skipping {}, face landmark recognition failed earlier...".format(a))
 
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser()
-    ap.add_argument("-c", "--clean", dest="clean", action="store_true")
-    args = ap.parse_args()
-
-    if not exists(OUTPUT_DIR) or args.clean:
-        if exists(OUTPUT_DIR):
-            shutil.rmtree(OUTPUT_DIR)
-
-        os.mkdir(OUTPUT_DIR)
-        os.mkdir(STAGING_DIR)
-
-        stage_data()
-
+    stage_data()
     process_data()
