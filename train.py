@@ -6,8 +6,17 @@ from os.path import join
 import numpy as np
 import tensorflow as tf
 from sklearn import preprocessing
+from datetime import datetime
 
-from constants import BATCH_SIZE, INPUTS, OUTPUT_DIR, OUTPUTS, EPOCHS
+from constants import (
+    BATCH_SIZE,
+    DATETIME_FORMAT,
+    INPUTS,
+    MODELS_DIR,
+    OUTPUT_DIR,
+    OUTPUTS,
+    EPOCHS,
+)
 
 
 def import_data(type):
@@ -31,23 +40,10 @@ def import_data(type):
 
 def build_simple_model():
     inputs = keras.Input(shape=(INPUTS))
-    x = layers.Dense(INPUTS, activation="relu")(inputs)
-    x = layers.Dense(INPUTS, activation="relu")(x)
-    x = layers.Dense(OUTPUTS, activation="relu")(x)
-
-    outputs = layers.Dense(OUTPUTS, activation="softmax")(x)
-    model = keras.Model(inputs, outputs)
-    return model
-
-
-def build_rnn_model():
-    inputs = keras.Input(shape=(INPUTS))
-    x = layers.Dense(128)(inputs)
-    x = layers.Dropout(0.4)(x)
-    x = layers.Dense(64)(x)
-    x = layers.Dropout(0.8)(x)
-    x = layers.Dense(64)(x)
-    outputs = layers.Dense(OUTPUTS)(x)
+    x = layers.Dense(64)(inputs)
+    x = layers.Dense(32)(x)
+    x = layers.Dense(16)(x)
+    outputs = layers.Dense(OUTPUTS, activation='sigmoid')(x)
 
     model = keras.Model(inputs, outputs)
     return model
@@ -57,17 +53,17 @@ if __name__ == "__main__":
     train_input, train_output = import_data("train")
     validate_input, validate_output = import_data("validate")
 
-    #train_input = preprocessing.normalize(train_input, "l1")
-    #train_output = preprocessing.normalize(train_output, "l1")
+    train_input = preprocessing.normalize(train_input, axis=1, norm="l1")
+    train_output = preprocessing.normalize(train_output, axis=1, norm="l1")
 
-    #validate_input = preprocessing.normalize(validate_input, "l1")
-    #validate_output = preprocessing.normalize(validate_output, "l1")
+    validate_input = preprocessing.normalize(validate_input, axis=1, norm="l1")
+    validate_output = preprocessing.normalize(validate_output, axis=1, norm="l1")
 
-    model = build_rnn_model()
+    model = build_simple_model()
 
     model.compile(
-        optimizer="sgd",
-        loss=tf.keras.losses.MeanSquaredLogarithmicError(),
+        loss="mean_squared_error",
+        optimizer="adam",
         metrics=["accuracy"],
     )
 
@@ -80,3 +76,4 @@ if __name__ == "__main__":
     ).batch(BATCH_SIZE)
 
     history = model.fit(dataset, validation_data=val_dataset, epochs=EPOCHS)
+    model.save("{}/{}.h5".format(MODELS_DIR, datetime.now().strftime(DATETIME_FORMAT)))
