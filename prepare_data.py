@@ -5,14 +5,14 @@ from os.path import isfile, join, exists
 import ffmpeg
 from pathlib import Path
 
-from analyze_audio import process_audio
-from analyze_frame import process_frame
+from analyze_audio import prepare_audio
+from analyze_frame import prepare_frame
 from constants import DATA_DIR, STAGING_DIR
 
 SPLIT_DELTA = 0.25
 
 
-def split_and_import(path):
+def split_and_import(path, output_dir=STAGING_DIR):
 
     probe = ffmpeg.probe(path)
 
@@ -37,14 +37,19 @@ def split_and_import(path):
             ss=point,
         )
         stream = ffmpeg.output(
-            stream, "{}/{}-{}.png".format(STAGING_DIR, base_name, i), vframes=1
+            stream,
+            "{}/{}-{}.png".format(output_dir, base_name, i),
+            vframes=1,
+            loglevel="quiet",
         )
         stream = ffmpeg.overwrite_output(stream)
         ffmpeg.run(stream)
 
         # Extract audio
         stream = ffmpeg.input(path, ss=point, t=SPLIT_DELTA)
-        stream = ffmpeg.output(stream, "{}/{}-{}.wav".format(STAGING_DIR, base_name, i))
+        stream = ffmpeg.output(
+            stream, "{}/{}-{}.wav".format(output_dir, base_name, i), loglevel="quiet"
+        )
         stream = ffmpeg.overwrite_output(stream)
         ffmpeg.run(stream)
 
@@ -68,12 +73,12 @@ def process_data():
     failed = []
 
     for p in [f for f in items if "png" in f.split(".")]:
-        if process_frame(p) is False:
+        if prepare_frame(p) is False:
             failed.append(Path(p).stem)
 
     for a in [f for f in items if "wav" in f.split(".")]:
         if Path(a).stem not in failed:
-            process_audio(a)
+            prepare_audio(a)
         else:
             print("Skipping {}, face landmark recognition failed earlier...".format(a))
 

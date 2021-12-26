@@ -11,8 +11,7 @@ from constants import OUTPUT_DIR, STAGING_DIR
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("models/shape_predictor_68_face_landmarks.dat")
 
-
-def process_frame(path):
+def analyze_frame(path):
     image = cv2.imread(path)
     grayscale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
@@ -30,6 +29,11 @@ def process_frame(path):
     for i in range(0, shape.num_parts):
         values.append(shape.part(i).x)
         values.append(shape.part(i).y)
+
+    return values
+
+def prepare_frame(path):
+    values = analyze_frame(path)
 
     with open(
         join(

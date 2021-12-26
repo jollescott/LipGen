@@ -26,7 +26,7 @@ def wavfile_fft(path):
     return freq_abs, fft_spectrum_abs
 
 
-def process_audio(path):
+def analyze_audio(path):
     freq, spectrum = wavfile_fft(path)
 
     values = []
@@ -40,6 +40,12 @@ def process_audio(path):
 
     for i in range(0, INPUTS):
         result.append(values[i][0] if i < len(values) else 0)
+
+    return result
+
+
+def prepare_audio(path):
+    result = analyze_audio(path)
 
     with open(join(OUTPUT_DIR, "input", Path(path).stem + ".json"), "w") as f:
         json.dump(result, f)

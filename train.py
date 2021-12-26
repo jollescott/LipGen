@@ -40,10 +40,10 @@ def import_data(type):
 
 def build_simple_model():
     inputs = keras.Input(shape=(INPUTS))
-    x = layers.Dense(64)(inputs)
-    x = layers.Dense(32)(x)
-    x = layers.Dense(16)(x)
-    outputs = layers.Dense(OUTPUTS, activation='sigmoid')(x)
+    x = layers.Dense(32, activation='relu')(inputs)
+    x = layers.Dense(64, activation='relu')(x)
+    x = layers.Dense(16, activation='relu')(x)
+    outputs = layers.Dense(OUTPUTS, activation='relu')(x)
 
     model = keras.Model(inputs, outputs)
     return model
@@ -53,11 +53,11 @@ if __name__ == "__main__":
     train_input, train_output = import_data("train")
     validate_input, validate_output = import_data("validate")
 
-    train_input = preprocessing.normalize(train_input, axis=1, norm="l1")
-    train_output = preprocessing.normalize(train_output, axis=1, norm="l1")
+    #train_input = preprocessing.normalize(train_input, axis=1, norm="l1")
+    #train_output = preprocessing.normalize(train_output, axis=1, norm="l1")
 
-    validate_input = preprocessing.normalize(validate_input, axis=1, norm="l1")
-    validate_output = preprocessing.normalize(validate_output, axis=1, norm="l1")
+    #validate_input = preprocessing.normalize(validate_input, axis=1, norm="l1")
+    #validate_output = preprocessing.normalize(validate_output, axis=1, norm="l1")
 
     model = build_simple_model()
 
