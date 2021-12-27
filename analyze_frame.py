@@ -1,7 +1,5 @@
 import cv2
 import dlib
-import argparse
-from imutils import face_utils
 import json
 from os.path import join
 from pathlib import Path
