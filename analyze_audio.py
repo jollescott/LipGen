@@ -8,7 +8,7 @@ import json
 import argparse
 from os.path import join
 
-from constants import AMPLITUDE_THRESHOLD, INPUTS, OUTPUT_DIR, STAGING_DIR
+from constants import AMPLITUDE_THRESHOLD, INPUTS, TEMP_DIR, STAGING_DIR
 
 
 def wavfile_fft(path):
@@ -47,7 +47,7 @@ def analyze_audio(path):
 def prepare_audio(path):
     result = analyze_audio(path)
 
-    with open(join(OUTPUT_DIR, "input", Path(path).stem + ".json"), "w") as f:
+    with open(join(TEMP_DIR, "input", Path(path).stem + ".json"), "w") as f:
         json.dump(result, f)
 
 

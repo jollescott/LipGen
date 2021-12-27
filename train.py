@@ -13,25 +13,25 @@ from constants import (
     DATETIME_FORMAT,
     INPUTS,
     MODELS_DIR,
-    OUTPUT_DIR,
+    TEMP_DIR,
     OUTPUTS,
     EPOCHS,
 )
 
 
-def import_data(type):
-    input_path = join(OUTPUT_DIR, "input", type)
+def import_data(subtype):
+    input_path = join(TEMP_DIR, "input", subtype)
 
     files = [f for f in os.listdir(input_path)]
     inputs = []
     outputs = []
 
     for file in files:
-        with open(join(OUTPUT_DIR, "input", file)) as f:
+        with open(join(TEMP_DIR, "input", subtype, file)) as f:
             input = json.load(f)
             inputs.append(input)
 
-        with open(join(OUTPUT_DIR, "output", file)) as f:
+        with open(join(TEMP_DIR, "output", subtype, file)) as f:
             output = json.load(f)
             outputs.append(output)
 
@@ -40,10 +40,10 @@ def import_data(type):
 
 def build_simple_model():
     inputs = keras.Input(shape=(INPUTS))
-    x = layers.Dense(32, activation='relu')(inputs)
-    x = layers.Dense(64, activation='relu')(x)
-    x = layers.Dense(16, activation='relu')(x)
-    outputs = layers.Dense(OUTPUTS, activation='relu')(x)
+    x = layers.Dense(32)(inputs)
+    x = layers.Dense(64)(x)
+    x = layers.Dense(16)(x)
+    outputs = layers.Dense(OUTPUTS, activation="sigmoid")(x)
 
     model = keras.Model(inputs, outputs)
     return model
@@ -52,12 +52,6 @@ def build_simple_model():
 if __name__ == "__main__":
     train_input, train_output = import_data("train")
     validate_input, validate_output = import_data("validate")
-
-    #train_input = preprocessing.normalize(train_input, axis=1, norm="l1")
-    #train_output = preprocessing.normalize(train_output, axis=1, norm="l1")
-
-    #validate_input = preprocessing.normalize(validate_input, axis=1, norm="l1")
-    #validate_output = preprocessing.normalize(validate_output, axis=1, norm="l1")
 
     model = build_simple_model()
 

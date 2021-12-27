@@ -24,19 +24,19 @@ def process_frame(path, model):
     ctx.set_source_rgb(0, 1, 0)
 
     for i in range(0, len(predict), 2):
-        x = predict[i] #* surface.get_width()
-        y = predict[i + 1] #* surface.get_height()
+        x = predict[i] * surface.get_width()
+        y = predict[i + 1] * surface.get_height()
 
-        ctx.arc(x, y, 2, 0, 2 * math.pi)
+        ctx.arc(x, y, 1, 0, 2 * math.pi)
         ctx.fill()
 
     dlib_truth = analyze_frame(path)
     ctx.set_source_rgb(0, 0, 1)
     for i in range(0, len(predict), 2):
-        x = dlib_truth[i]
-        y = dlib_truth[i + 1]
+        x = dlib_truth[i] * surface.get_width()
+        y = dlib_truth[i + 1] * surface.get_height()
 
-        ctx.arc(x, y, 2, 0, 2 * math.pi)
+        ctx.arc(x, y, 1, 0, 2 * math.pi)
         ctx.fill()
 
     surface.write_to_png(path)
@@ -44,8 +44,8 @@ def process_frame(path, model):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    # ap.add_argument("mp4")
-    # args = ap.parse_args()
+    ap.add_argument("mp4")
+    args = ap.parse_args()
 
     if exists(PREVIEW_DIR):
         shutil.rmtree(PREVIEW_DIR)
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     preview_stage = join(PREVIEW_DIR, "staging")
     makedirs(preview_stage)
 
-    split_and_import("temp/test.mp4", preview_stage)
+    split_and_import(args.mp4, preview_stage)
 
     models = [f for f in listdir(MODELS_DIR) if isfile(join(MODELS_DIR, f))]
     print("\n")

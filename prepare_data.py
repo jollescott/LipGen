@@ -1,8 +1,7 @@
 import os
-import shutil
-import argparse
-from os.path import isfile, join, exists
+from os.path import isfile, join
 import ffmpeg
+import math
 from pathlib import Path
 
 from analyze_audio import prepare_audio
@@ -25,7 +24,7 @@ def split_and_import(path, output_dir=STAGING_DIR):
         return
 
     duration = float(audio_stream["duration"])
-    points = [x * SPLIT_DELTA for x in range(0, round(duration / SPLIT_DELTA))]
+    points = [x * SPLIT_DELTA for x in range(0, math.floor(duration / SPLIT_DELTA))]
 
     for i, point in enumerate(points):
 
@@ -34,7 +33,7 @@ def split_and_import(path, output_dir=STAGING_DIR):
         # Extract frame
         stream = ffmpeg.input(
             path,
-            ss=point,
+            ss=point + SPLIT_DELTA / 2,
         )
         stream = ffmpeg.output(
             stream,

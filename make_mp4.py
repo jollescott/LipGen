@@ -12,7 +12,9 @@ files = [
 
 for file in files:
     stream = ffmpeg.input(join(DATA_DIR, file))
-    stream = ffmpeg.output(stream, "{}/{}.mp4".format(DATA_DIR, file.split(".")[0]))
+    stream = ffmpeg.output(
+        stream, "{}/{}.mp4".format(DATA_DIR, file.split(".")[0]), loglevel="quiet"
+    )
     stream = ffmpeg.overwrite_output(stream)
     ffmpeg.run(stream)
 

@@ -1,5 +1,5 @@
 DATA_DIR = "data"
-OUTPUT_DIR = "temp"
+TEMP_DIR = "temp"
 STAGING_DIR = "temp/staging"
 MODELS_DIR = "temp/models"
 PREVIEW_DIR = "temp/preview"
