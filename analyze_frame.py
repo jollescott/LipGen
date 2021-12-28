@@ -8,7 +8,7 @@ from constants import OUTPUT_DIR
 
 def analyze_frame(path):
     image = cv2.imread(path)
-    height, width = image.shape
+    height, width, channels = image.shape
     grayscale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     detector = dlib.get_frontal_face_detector()

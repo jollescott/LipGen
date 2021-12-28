@@ -35,7 +35,14 @@ def process_data(worker_count=1):
     work_dist = np.array_split(audio_files, worker_count)
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        executor.map(process_worker_entry, work_dist)
+        futures = [executor.submit(process_worker_entry, work) for work in work_dist]
+
+        for future in futures:
+            try:
+                result = future.result()
+                print(result)
+            except Exception as e:
+                print("Thread threw exception:", e)
 
 
 def split_and_import(path, output_dir=STAGING_DIR):
