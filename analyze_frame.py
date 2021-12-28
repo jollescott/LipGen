@@ -6,14 +6,13 @@ from pathlib import Path
 
 from constants import OUTPUT_DIR
 
-detector = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor("models/shape_predictor_68_face_landmarks.dat")
-
-
 def analyze_frame(path):
     image = cv2.imread(path)
-    height, width, channels = image.shape
+    height, width = image.shape
     grayscale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    detector = dlib.get_frontal_face_detector()
+    predictor = dlib.shape_predictor("models/shape_predictor_68_face_landmarks.dat")
 
     rects = detector(grayscale, 1)
 
