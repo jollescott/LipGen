@@ -11,7 +11,7 @@ import math
 from analyze_frame import analyze_frame
 
 from constants import MODELS_DIR, PREVIEW_DIR
-from prepare_data import split_and_import
+from build_data import split_and_import
 
 
 def process_frame(path, model):

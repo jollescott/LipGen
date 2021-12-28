@@ -4,7 +4,7 @@ import json
 from os.path import join
 from pathlib import Path
 
-from constants import TEMP_DIR, STAGING_DIR
+from constants import OUTPUT_DIR
 
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("models/shape_predictor_68_face_landmarks.dat")
@@ -40,8 +40,7 @@ def prepare_frame(path):
 
     with open(
         join(
-            TEMP_DIR,
-            "output",
+            OUTPUT_DIR,
             Path(path).stem + ".json",
         ),
         "w",

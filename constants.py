@@ -1,6 +1,7 @@
 DATA_DIR = "data"
-TEMP_DIR = "temp"
 STAGING_DIR = "temp/staging"
+OUTPUT_DIR = "temp/output"
+INPUT_DIR = "temp/input"
 MODELS_DIR = "temp/models"
 PREVIEW_DIR = "temp/preview"
 AMPLITUDE_THRESHOLD = 50
