@@ -11,27 +11,28 @@ from datetime import datetime
 from constants import (
     BATCH_SIZE,
     DATETIME_FORMAT,
+    INPUT_DIR,
     INPUTS,
     MODELS_DIR,
-    TEMP_DIR,
+    OUTPUT_DIR,
     OUTPUTS,
     EPOCHS,
 )
 
 
 def import_data(subtype):
-    input_path = join(TEMP_DIR, "input", subtype)
+    input_path = join(INPUT_DIR, subtype)
 
     files = [f for f in os.listdir(input_path)]
     inputs = []
     outputs = []
 
     for file in files:
-        with open(join(TEMP_DIR, "input", subtype, file)) as f:
+        with open(join(INPUT_DIR, subtype, file)) as f:
             input = json.load(f)
             inputs.append(input)
 
-        with open(join(TEMP_DIR, "output", subtype, file)) as f:
+        with open(join(OUTPUT_DIR, subtype, file)) as f:
             output = json.load(f)
             outputs.append(output)
 
@@ -43,7 +44,7 @@ def build_simple_model():
     x = layers.Dense(32)(inputs)
     x = layers.Dense(64)(x)
     x = layers.Dense(16)(x)
-    outputs = layers.Dense(OUTPUTS, activation="sigmoid")(x)
+    outputs = layers.Dense(OUTPUTS, activation="relu")(x)
 
     model = keras.Model(inputs, outputs)
     return model

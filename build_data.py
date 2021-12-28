@@ -5,10 +5,37 @@ import argparse
 from pathlib import Path
 import numpy as np
 import concurrent.futures
+import shutil
 
-from analyze_audio import prepare_audio
-from analyze_frame import prepare_frame
-from constants import DATA_DIR, STAGING_DIR
+from analyze_audio import process_audio
+from analyze_frame import process_frame
+from constants import DATA_DIR, INPUT_DIR, OUTPUT_DIR, STAGING_DIR
+
+REQUIRED_DIRS = [OUTPUT_DIR, INPUT_DIR, STAGING_DIR]
+
+
+def process_worker_entry(audio_files):
+    for audio_file in audio_files:
+        img_file = str.replace(audio_file, ".wav", ".png")
+
+        if process_frame(img_file) == False:
+            print("{} failed to process frame, skipping...".format(img_file))
+            continue
+
+        process_audio(audio_file)
+
+
+def process_data(worker_count=1):
+    audio_files = [
+        join(STAGING_DIR, f)
+        for f in os.listdir(STAGING_DIR)
+        if isfile(join(STAGING_DIR, f)) and "wav" in f.split(".")
+    ]
+
+    work_dist = np.array_split(audio_files, worker_count)
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        executor.map(process_worker_entry, work_dist)
 
 
 def split_and_import(path, output_dir=STAGING_DIR):
@@ -67,7 +94,7 @@ def import_worker_entry(files):
         split_and_import(file)
 
 
-def import_data_staging(worker_count=1):
+def import_data(worker_count=1):
     import_files = [
         join(DATA_DIR, f) for f in os.listdir(DATA_DIR) if isfile(join(DATA_DIR, f))
     ]
@@ -91,7 +118,11 @@ if __name__ == "__main__":
 
     args = ap.parse_args()
 
-    if exists(STAGING_DIR) is False:
-        os.makedirs(STAGING_DIR)
+    for dir in REQUIRED_DIRS:
+        if exists(dir):
+            shutil.rmtree(dir)
 
-    import_data_staging(args.workers)
+        os.makedirs(dir)
+
+    import_data(args.workers)
+    process_data(args.workers)

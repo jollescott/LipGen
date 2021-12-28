@@ -9,6 +9,7 @@ from constants import OUTPUT_DIR
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("models/shape_predictor_68_face_landmarks.dat")
 
+
 def analyze_frame(path):
     image = cv2.imread(path)
     height, width, channels = image.shape
@@ -26,25 +27,25 @@ def analyze_frame(path):
     values = []
 
     for i in range(0, shape.num_parts):
-        
+
         values.append(shape.part(i).x / width)
         values.append(shape.part(i).y / height)
 
     return values
 
-def prepare_frame(path):
+
+def process_frame(path):
     values = analyze_frame(path)
 
     if values is None:
         return False
 
-    with open(
-        join(
-            OUTPUT_DIR,
-            Path(path).stem + ".json",
-        ),
-        "w",
-    ) as f:
-        json.dump(values, f)
+    path = join(
+        OUTPUT_DIR,
+        Path(path).stem + ".json",
+    )
 
+    with open(path, 'w') as f:
+        json.dump(values, f)
+        
     return True

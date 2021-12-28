@@ -8,43 +8,37 @@ import json
 import argparse
 from os.path import join
 
-from constants import AMPLITUDE_THRESHOLD, INPUT_DIR, INPUTS, OUTPUT_DIR, STAGING_DIR
+from constants import AMPLITUDE_THRESHOLD, INPUT_DIR, INPUTS
 
 
 def wavfile_fft(path):
     sr, y = wavfile.read(path)
-
-    y = y / 2.0 ** 15
     signal = y.T[0]
 
-    fft_spectrum = fft(signal)
+    fft_amp = fft(signal)
     freq = fftfreq(signal.size, d=1.0 / sr)
 
-    fft_spectrum_abs = np.abs(fft_spectrum)
-    freq_abs = np.abs(freq)
+    freq_n = int(len(freq) / 2)
+    amp_n = int(len(fft_amp) / 2)
 
-    return freq_abs, fft_spectrum_abs
+    return np.abs(freq[freq_n:]), np.abs(fft_amp[amp_n:])
 
 
 def analyze_audio(path):
-    freq, spectrum = wavfile_fft(path)
+    freq, amp = wavfile_fft(path)
 
-    values = []
-
-    for i, f in enumerate(spectrum):
-        if f > AMPLITUDE_THRESHOLD:
-            values.append((np.round(freq[i]), np.round(f)))
+    values = ((freq[i], f) for i, f in enumerate(amp))
 
     values = sorted(values, key=lambda t: t[1], reverse=True)
     result = []
 
     for i in range(0, INPUTS):
-        result.append(values[i][0] if i < len(values) else 0)
+        result.append(values[i][0])
 
     return result
 
 
-def prepare_audio(path):
+def process_audio(path):
     result = analyze_audio(path)
 
     with open(join(INPUT_DIR, Path(path).stem + ".json"), "w") as f:
@@ -56,10 +50,12 @@ if __name__ == "__main__":
     ap.add_argument("wavfile")
     args = ap.parse_args()
 
-    fx, fy = wavfile_fft(join(STAGING_DIR, args.wavfile))
+    fx, fy = wavfile_fft(args.wavfile)
+
+    print(fy)
 
     for i, f in enumerate(fy):
-        if f > 50:
+        if f > AMPLITUDE_THRESHOLD:
             print(
                 "frequency = {} Hz with amplitude {} ".format(
                     np.round(fx[i], 1), np.round(f)

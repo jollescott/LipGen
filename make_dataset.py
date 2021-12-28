@@ -3,13 +3,13 @@ from os.path import join, isfile, exists
 from random import randint
 import shutil
 
-from constants import TEMP_DIR, TRAIN_VALIDATE_RATIO
+from constants import INPUT_DIR, OUTPUT_DIR, TRAIN_VALIDATE_RATIO
 
 DIRS = [
-    join(TEMP_DIR, "input", "train"),
-    join(TEMP_DIR, "input", "validate"),
-    join(TEMP_DIR, "output", "train"),
-    join(TEMP_DIR, "output", "validate"),
+    join(INPUT_DIR, "train"),
+    join(INPUT_DIR, "validate"),
+    join(OUTPUT_DIR, "train"),
+    join(OUTPUT_DIR, "validate"),
 ]
 
 for input_files in DIRS:
@@ -19,23 +19,21 @@ for input_files in DIRS:
     os.mkdir(input_files)
 
 
-input_files = join(TEMP_DIR, "input")
-
-files = [f for f in os.listdir(input_files) if isfile(join(input_files, f))]
+files = [f for f in os.listdir(INPUT_DIR) if isfile(join(INPUT_DIR, f))]
 orig_len = len(files)
 
 while len(files) > orig_len * TRAIN_VALIDATE_RATIO:
     file = files.pop(randint(0, len(files) - 1))
-    shutil.copy(join(TEMP_DIR, 'input', file), join(TEMP_DIR, "input", "train", file))
-    shutil.copy(join(TEMP_DIR, 'output', file), join(TEMP_DIR, "output", "train", file))
+    shutil.copy(join(INPUT_DIR, file), join(INPUT_DIR, "train", file))
+    shutil.copy(join(OUTPUT_DIR, file), join(OUTPUT_DIR, "train", file))
 
 
 for file in files:
     shutil.copy(
-        join(TEMP_DIR, "input", file),
-        join(TEMP_DIR, "input", "validate", file),
+        join(INPUT_DIR, file),
+        join(INPUT_DIR, "validate", file),
     )
     shutil.copy(
-        join(TEMP_DIR, "output", file),
-        join(TEMP_DIR, "output", "validate", file),
+        join(OUTPUT_DIR, file),
+        join(OUTPUT_DIR, "validate", file),
     )
