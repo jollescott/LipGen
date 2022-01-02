@@ -28,6 +28,7 @@ def analyze_audio(path):
     freq, amp = wavfile_fft(path)
 
     values = ((freq[i], f) for i, f in enumerate(amp))
+    values = filter(lambda x: 125 < x[0] < 8000, values)
 
     values = sorted(values, key=lambda t: t[1], reverse=True)
     result = []

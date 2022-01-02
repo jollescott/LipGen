@@ -42,9 +42,8 @@ def import_data(subtype):
 def build_simple_model():
     inputs = keras.Input(shape=(INPUTS))
     x = layers.Dense(32)(inputs)
-    x = layers.Dense(64)(x)
     x = layers.Dense(16)(x)
-    outputs = layers.Dense(OUTPUTS, activation="relu")(x)
+    outputs = layers.Dense(OUTPUTS)(x)
 
     model = keras.Model(inputs, outputs)
     return model
@@ -59,7 +58,6 @@ if __name__ == "__main__":
     model.compile(
         loss="mean_squared_error",
         optimizer="adam",
-        metrics=["accuracy"],
     )
 
     dataset = tf.data.Dataset.from_tensor_slices((train_input, train_output)).batch(

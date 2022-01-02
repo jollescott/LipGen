@@ -32,6 +32,7 @@ def process_data(worker_count=1):
         if isfile(join(STAGING_DIR, f)) and "wav" in f.split(".")
     ]
 
+    """
     work_dist = np.array_split(audio_files, worker_count)
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -43,6 +44,9 @@ def process_data(worker_count=1):
                 print(result)
             except Exception as e:
                 print("Thread threw exception:", e)
+    """
+
+    process_worker_entry(audio_files)
 
 
 def split_and_import(path, output_dir=STAGING_DIR):
@@ -70,11 +74,11 @@ def split_and_import(path, output_dir=STAGING_DIR):
     i = 0
     step = 0
 
-    while step < audio_duration:
+    while step < audio_duration - (delta_time / 2):
         base_name = Path(path).stem
 
         # Extract frame
-        stream = ffmpeg.input(path, ss=step)
+        stream = ffmpeg.input(path, ss=step + (delta_time / 2))
         stream = ffmpeg.output(
             stream,
             "{}/{}-{}.png".format(output_dir, base_name, i),
